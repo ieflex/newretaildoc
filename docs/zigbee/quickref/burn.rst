@@ -52,15 +52,19 @@
 
 （2）将固件拷贝到JN-SW-4107的安装目录下（D:\Program Code\ProductionFlashProgrammer）。
 
+.. image:: img/burn3.png
+    :alt: burn
+    :width: 540px
+
 （3）打开命令提示符，进入该目录，输入命令：JN51xxProgrammer.exe -s 端口号 -f 固件
 
-.. image:: img/burn3.png
+.. image:: img/burn4.png
     :alt: burn
     :width: 540px
 
 （4）等待烧写结束：
 
-.. image:: img/burn4.png
+.. image:: img/burn5.png
     :alt: burn
     :width: 540px
 
