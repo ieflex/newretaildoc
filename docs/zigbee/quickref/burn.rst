@@ -44,13 +44,13 @@
 烧写方法
 ----------------------------
 
-（1）将设备进入烧写模式（以EndDevice_JN5168.bin为例），然后连接至电脑：
+（1）将设备进入烧写模式（以EndDevice_JN5168.bin为例），然后连接至电脑
 
 .. image:: img/burn2.png
     :alt: burn
     :width: 540px
 
-（2）将固件拷贝到JN-SW-4107的安装目录下（D:\Program Code\ProductionFlashProgrammer）。
+（2）将固件拷贝到JN-SW-4107的安装目录下（D:\Program Code\ProductionFlashProgrammer）
 
 .. image:: img/burn3.png
     :alt: burn
@@ -62,9 +62,15 @@
     :alt: burn
     :width: 540px
 
-（4）等待烧写结束：
+（4）等待烧写结束
 
 .. image:: img/burn5.png
+    :alt: burn
+    :width: 540px
+
+（5）将设备退出烧写模式后，重新插拔连接至电脑即可运行
+
+.. image:: img/burn6.jpg
     :alt: burn
     :width: 540px
 
