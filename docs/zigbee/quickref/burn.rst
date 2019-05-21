@@ -44,9 +44,9 @@
 烧写方法
 ----------------------------
 
-（1）将设备进入烧写模式（以EndDevice_JN5168.bin为例）：
+（1）将设备进入烧写模式（以EndDevice_JN5168.bin为例），然后连接至电脑：
 
-.. image:: img/burn2.jpg
+.. image:: img/burn2.png
     :alt: burn
     :width: 540px
 
