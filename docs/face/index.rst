@@ -7,103 +7,100 @@
 V4L2
 ----------------------------
 
-(I) **介绍**
+一、**介绍**
 
-V4L2是Video for Linux API version 2的简称，是linux中关于视频设备的内核驱动。在Linux中，视频设备是设备文件，可以像访问普通文件一样对其进行读写。
-
-
-(#) **支持的接口**
-
-可以支持多种设备,它可以有以下几种接口:
-1. 视频采集接口(video capture interface)
-	这种应用的设备可以是高频头或者摄像头.V4L2的最初设计就是应用于这种功能的。
-
-#. 视频输出接口(video output interface)
-	可以驱动计算机的外围视频图像设备——像可以输出电视信号格式的设备。
-
-#. 直接传输视频接口(video overlay interface)
-	它的主要工作是把从视频采集设备采集过来的信号直接输出到输出设备之上，而不用经过系统的CPU。
-
-#. 视频间隔消隐信号接口(VBI interface)
-	它可以使应用可以访问传输消隐期的视频信号。
-
-#. 收音机接口(radio interface)
-	可用来处理从AM或FM高频头设备接收来的音频流。
+	V4L2是Video for Linux API version 2的简称，是linux中关于视频设备的内核驱动。在Linux中，视频设备是设备文件，可以像访问普通文件一样对其进行读写。
 
 
-(#) **采集方式**
+二、**支持的接口**
 
-1. 打开视频设备
-::
-	int fd = open("/dev/video0", O_RDWR);
+	可以支持多种设备,它可以有以下几种接口:
 
-#. 设定属性。视频设备打开后，通常使用 ioctl 函数获取和设置视频设备的属性。
-::
-	struct v4l2_capability cap;
-	ioctl(fd, VIDIOC_QUERYCAP, &cap)
+	1. 视频采集接口(video capture interface)
+		这种应用的设备可以是高频头或者摄像头.V4L2的最初设计就是应用于这种功能的。
+	2. 视频输出接口(video output interface)
+		可以驱动计算机的外围视频图像设备——像可以输出电视信号格式的设备。
+	3. 直接传输视频接口(video overlay interface)
+		它的主要工作是把从视频采集设备采集过来的信号直接输出到输出设备之上，而不用经过系统的CPU。
+	4. 视频间隔消隐信号接口(VBI interface)
+		它可以使应用可以访问传输消隐期的视频信号。
+	5. 收音机接口(radio interface)
+		可用来处理从AM或FM高频头设备接收来的音频流。
 
-#. 设定采集方式。根据需要设置视频设备的采集方式为V4L2_MEMORY_USERPTR或V4L2_MEMORY_MMAP等。
-::
-	struct v4l2_requestbuffers req;
-	memset(&req, 0, sizeof(req));
-	req.count	= 4;
-	req.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	req.memory	= V4L2_MEMORY_USERPTR;
-	ioctl(fd, VIDIOC_REQBUFS, &req);
 
-#. 启动数据采集
-::
-	enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	ioctl(fd, VIDIOC_STREAMON, &type);
+三、**采集方式**
 
-#. 循环采集数据并处理
-::
-	fd_set fds;
-	struct timeval tv;
-	FD_ZERO(&fds);
-	FD_SET(fd, &fds);
-	tv.tv_sec	 = 2;
-	tv.tv_usec = 0;
-	if(select(fd + 1, &fds, NULL, NULL, &tv) > 0)
-	{
-		struct v4l2_buffer buf;
-		memset(&buf, 0, sizeof(buf));
-		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-		buf.memory = V4L2_MEMORY_USERPTR;
-		if(0 == ioctl(fd, VIDIOC_DQBUF, &buf))
+	1. 打开视频设备
+	::
+		int fd = open("/dev/video0", O_RDWR);
+
+	#. 设定属性。视频设备打开后，通常使用 ioctl 函数获取和设置视频设备的属性。
+	::
+		struct v4l2_capability cap;
+		ioctl(fd, VIDIOC_QUERYCAP, &cap)
+
+	#. 设定采集方式。根据需要设置视频设备的采集方式为V4L2_MEMORY_USERPTR或V4L2_MEMORY_MMAP等。
+	::
+		struct v4l2_requestbuffers req;
+		memset(&req, 0, sizeof(req));
+		req.count	= 4;
+		req.type	= V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		req.memory	= V4L2_MEMORY_USERPTR;
+		ioctl(fd, VIDIOC_REQBUFS, &req);
+
+	#. 启动数据采集
+	::
+		enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		ioctl(fd, VIDIOC_STREAMON, &type);
+
+	#. 循环采集数据并处理
+	::
+		fd_set fds;
+		struct timeval tv;
+		FD_ZERO(&fds);
+		FD_SET(fd, &fds);
+		tv.tv_sec	 = 2;
+		tv.tv_usec = 0;
+		if(select(fd + 1, &fds, NULL, NULL, &tv) > 0)
 		{
-			// 处理图像数据
+			struct v4l2_buffer buf;
+			memset(&buf, 0, sizeof(buf));
+			buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+			buf.memory = V4L2_MEMORY_USERPTR;
+			if(0 == ioctl(fd, VIDIOC_DQBUF, &buf))
+			{
+				// 处理图像数据
+			}
+			ioctl(fd, VIDIOC_QBUF, &buf);
 		}
-		ioctl(fd, VIDIOC_QBUF, &buf);
-	}
 
-#. 停止数据采集
-::
-	enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	ioctl(fd, VIDIOC_STREAMOFF, &type);
+	#. 停止数据采集
+	::
+		enum v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		ioctl(fd, VIDIOC_STREAMOFF, &type);
 
-#. 关闭视频设备
-::
-	close(fd);
+	#. 关闭视频设备
+	::
+		close(fd);
 
 
-(#) **示例及文档**
+四、**示例及文档**
 
-:示例: https://linuxtv.org/downloads/legacy/video4linux/API/V4L2_API/v4l2spec/capture.c
-:文档: https://linuxtv.org/downloads/v4l-dvb-apis/uapi/v4l/v4l2.html
+	:示例: https://linuxtv.org/downloads/legacy/video4linux/API/V4L2_API/v4l2spec/capture.c
+	:文档: https://linuxtv.org/downloads/v4l-dvb-apis/uapi/v4l/v4l2.html
 
 
 opencv
 ----------------------------
 
-(I) **介绍**
+一、**介绍**
 
 OpenCV（Open Source Computer Vision Library）是一个开源的计算机视觉和机器学习软件库。OpenCV的建立是为了加速计算机视觉在商业产品中的应用。OpenCV采用BSD开源协议，所以对非商业应用和商业应用都是免费（FREE）的。
 OpenCV提供了C++、Python、Java和Matlab等接口，支持Windows、Linux、Android和Mac操作系统。OpenCV主要倾向于实时视觉应用程序，并在可用时利用MMX和SSE指令以提高运算速度。
 OpenCV包含有2500多个优化算法，其中包括一系列经典的和最先进的计算机视觉和机器学习算法，这些算法可用于检测和识别人脸、识别对象、对视频中的人类行为进行分类、跟踪摄像机运动、跟踪运动对象、提取对象的3D模型、从立体摄像机中生成3D点云、将图像拼接在一起以生成整个场景的高分辨率图像、从图像数据库中查找相似图像、从图像中去除红眼、跟踪眼睛运动、识别场景并建立标记以覆盖场景等。OpenCV拥有超过47000人的用户群和超过1800万的下载量，广泛用于公司、研究团体和政府机构。
 
 
-(#) **环境搭建（使用qt作为开发环境）**
+二、**环境搭建（使用qt作为开发环境）**
 
 在 https://github.com/opencv/opencv 下载opencv.zip
 在 https://github.com/opencv/opencv_contrib 下载opencv_contrib.zip
@@ -145,7 +142,7 @@ OpenCV包含有2500多个优化算法，其中包括一系列经典的和最先�
 			LIBS += /home/software/opencv/lib/libopencv_*.so
 
 
-(#) **人脸检测**
+三、**人脸检测**
 
 使用“摄像头 + OpenCV”实现人脸检测的基本步骤为：
 ::
