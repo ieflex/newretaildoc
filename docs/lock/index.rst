@@ -3,7 +3,7 @@
 小程序开锁
 ============================
 
-	小程序开锁采用 Python 语言实现，主要涉及到 **MQTT协议**、**Wifi连接**等。
+	小程序开锁采用 Python 语言实现，主要涉及到 **MQTT协议** 、 **Wifi连接** 等。
 
 MQTT协议
 ----------------------------
@@ -37,14 +37,14 @@ WiFi连接
 	在 Skids 开发板上连接 WiFi 的代码如下：
 	::
 		def connectWifi(ssid, passwd):
-			global wlan
-			
-			wlan = network.WLAN(network.STA_IF)			#create a wlan object
-			wlan.active(True)							#Activate the network interface
-			wlan.disconnect()							#Disconnect the last connected WiFi
-			wlan.connect(ssid, passwd)					#connect wifi
-			while(wlan.ifconfig()[0] == '0.0.0.0'):
-				time.sleep(1)
+		    global wlan
+		    
+		    wlan = network.WLAN(network.STA_IF)         #create a wlan object
+		    wlan.active(True)                           #Activate the network interface
+		    wlan.disconnect()                           #Disconnect the last connected WiFi
+		    wlan.connect(ssid, passwd)                  #connect wifi
+		    while(wlan.ifconfig()[0] == '0.0.0.0'):
+		        time.sleep(1)
 
 
 主要代码
@@ -60,145 +60,145 @@ WiFi连接
 
 	2. 定义变量
 	::
-		SSID			= ""										#WiFi 名称
-		PASSWORD		= ""										#WiFi 密码
+		SSID            = ""                                        #WiFi 名称
+		PASSWORD        = ""                                        #WiFi 密码
 		
-		SHOPID			= ""										#shop id
-		SERVER			= ""										#MQTT 服务器 ip
-		SERVER_PORT		= 3881										#MQTT 服务器端口
-		OPEN_DELAY_MS	= 5000										#开门持续时间（时间结束后，自动关门）
-		CHECK_DELAY_MS	= 50										#在开门状态下，检查 MQTT 消息的间隔时间
-		CLIENT_ID		= "5B6A23C4-183B-48C9-BD6D-154AAC80D5C3"	#MQTT 客户端 id
-		username		= None										#MQTT 用户名
-		password		= None										#MQTT 密码
+		SHOPID          = ""                                        #shop id
+		SERVER          = ""                                        #MQTT 服务器 ip
+		SERVER_PORT     = 3881                                      #MQTT 服务器端口
+		OPEN_DELAY_MS   = 5000                                      #开门持续时间（时间结束后，自动关门）
+		CHECK_DELAY_MS  = 50                                        #在开门状态下，检查 MQTT 消息的间隔时间
+		CLIENT_ID       = "5B6A23C4-183B-48C9-BD6D-154AAC80D5C3"    #MQTT 客户端 id
+		username        = None                                      #MQTT 用户名
+		password        = None                                      #MQTT 密码
 		
-		OUTPUT_OPEN		= 0			#开门为低电平
-		OUTPUT_CLOSE	= 1			#关门为高电平
-
-		TOPIC			= "TOPIC"
-		mqttClient		= None
-		flag_opening	= False
-		close_time		= None
-		flag_new_msg	= False
-		flag_quit		= False
-		wlan			= None
+		OUTPUT_OPEN     = 0         #开门为低电平
+		OUTPUT_CLOSE    = 1         #关门为高电平
+		
+		TOPIC           = "TOPIC"
+		mqttClient      = None
+		flag_opening    = False
+		close_time      = None
+		flag_new_msg    = False
+		flag_quit       = False
+		wlan            = None
 
 	3. 初始化门的状态为关闭
 	::
-		OUTPUT = machine.Pin(21, machine.Pin.OUT)		#初始化 Pin
-		OUTPUT.value(OUTPUT_CLOSE)						#程序启动后先关门
+		OUTPUT = machine.Pin(21, machine.Pin.OUT)       #初始化 Pin
+		OUTPUT.value(OUTPUT_CLOSE)                      #程序启动后先关门
 
 	4. 开门函数
 	::
-		def open_door():								#开门时调用
-		global close_time
-		global OPEN_DELAY_MS
-		global flag_opening
-		global OUTPUT
-		global OUTPUT_OPEN
-
-		if flag_opening:
-			close_time = time.ticks_ms() + OPEN_DELAY_MS
-			print("door is already opened, update close time", time.ticks_ms())
-		else:
-			close_time = time.ticks_ms() + OPEN_DELAY_MS
-			flag_opening = True
-			OUTPUT.value(OUTPUT_OPEN)
-			print("open_door", time.ticks_ms())
+		def open_door():                                #开门时调用
+		    global close_time
+		    global OPEN_DELAY_MS
+		    global flag_opening
+		    global OUTPUT
+		    global OUTPUT_OPEN
+		    
+		    if flag_opening:
+		        close_time = time.ticks_ms() + OPEN_DELAY_MS
+		        print("door is already opened, update close time", time.ticks_ms())
+		    else:
+		        close_time = time.ticks_ms() + OPEN_DELAY_MS
+		        flag_opening = True
+		        OUTPUT.value(OUTPUT_OPEN)
+		        print("open_door", time.ticks_ms())
 
 	5. 关门函数
 	::
-		def close_door():								#关门时调用
-		global flag_opening
-		global OUTPUT
-		global OUTPUT_OPEN
+		def close_door():                               #关门时调用
+		    global flag_opening
+		    global OUTPUT
+		    global OUTPUT_OPEN
 
-		if flag_opening:
-			flag_opening = False
-			OUTPUT.value(OUTPUT_CLOSE)
-			print("close_door", time.ticks_ms())
-		else:
-			print("door is already closed", time.ticks_ms())
+		    if flag_opening:
+		        flag_opening = False
+		        OUTPUT.value(OUTPUT_CLOSE)
+		        print("close_door", time.ticks_ms())
+		    else:
+		        print("door is already closed", time.ticks_ms())
 
 	6. MQTT消息回调函数
 	::
 		def msg_callback(topic, msg):
-		global flag_new_msg
-		global TOPIC
-		global SHOPID
-		
-		flag_new_msg = True
-		
-		if topic != TOPIC:
-			return
-		
-		msg_json = None;
-		try:
-			msg_json = json.loads(msg)
-		except:
-			msg_json = None;
-		
-		if None == msg_json:
-			return
-		
-		if msg_json.get("id") != SHOPID:
-			return
-		
-		action = msg_json.get("action")
-		if "open" == action:
-			open_door()
-		elif "close" == action:
-			close_door()
+		    global flag_new_msg
+		    global TOPIC
+		    global SHOPID
+		    
+		    flag_new_msg = True
+		    
+		    if topic != TOPIC:
+		        return
+		    
+		    msg_json = None;
+		    try:
+		        msg_json = json.loads(msg)
+		    except:
+		        msg_json = None;
+		    
+		    if None == msg_json:
+		        return
+		    
+		    if msg_json.get("id") != SHOPID:
+		        return
+		    
+		    action = msg_json.get("action")
+		    if "open" == action:
+		        open_door()
+		    elif "close" == action:
+		        close_door()
 
 	7. 连接 WiFi 函数
 	::
 		def connectWifi(ssid, passwd):
-		global wlan
-		
-		wlan = network.WLAN(network.STA_IF)			#create a wlan object
-		wlan.active(True)							#Activate the network interface
-		wlan.disconnect()							#Disconnect the last connected WiFi
-		wlan.connect(ssid, passwd)					#connect wifi
-		while(wlan.ifconfig()[0] == '0.0.0.0'):
-			time.sleep(1)
+		    global wlan
+		    
+		    wlan = network.WLAN(network.STA_IF)         #create a wlan object
+		    wlan.active(True)                           #Activate the network interface
+		    wlan.disconnect()                           #Disconnect the last connected WiFi
+		    wlan.connect(ssid, passwd)                  #connect wifi
+		    while(wlan.ifconfig()[0] == '0.0.0.0'):
+		        time.sleep(1)
 
 	8. 主循环
 	::
 		while not flag_quit:
-			try:
-				mqttClient	= None
-				
-				connectWifi(SSID,PASSWORD)
-				server = SERVER
-				mqttClient = MQTTClient(CLIENT_ID, server, SERVER_PORT, username, password)		#create a mqtt client
-				mqttClient.set_callback(msg_callback)											#set callback
-				mqttClient.connect()															#connect mqtt
-				mqttClient.subscribe(TOPIC)														#client subscribes to a topic
-				print("Connected to %s, subscribed to %s topic" % (server, TOPIC))
-
-				while True:
-					if flag_opening:
-						flag_new_msg = False
-						mqttClient.check_msg()
-						
-						if flag_opening and (time.ticks_ms() >= close_time):
-							close_door()
-						elif not flag_new_msg:
-							time.sleep_ms(CHECK_DELAY_MS)
-					else:
-						mqttClient.wait_msg()													#wait message
-			
-			except KeyboardInterrupt:
-				flag_quit = True;
-			
-			except:
-				pass
-			
-			finally:
-				if(mqttClient is not None):
-					mqttClient.disconnect()
-				wlan.disconnect()
-				wlan.active(False)
-		
+		    try:
+		        mqttClient  = None
+		        
+		        connectWifi(SSID,PASSWORD)
+		        server = SERVER
+		        mqttClient = MQTTClient(CLIENT_ID, server, SERVER_PORT, username, password)     #create a mqtt client
+		        mqttClient.set_callback(msg_callback)                                           #set callback
+		        mqttClient.connect()                                                            #connect mqtt
+		        mqttClient.subscribe(TOPIC)                                                     #client subscribes to a topic
+		        print("Connected to %s, subscribed to %s topic" % (server, TOPIC))
+		        
+		        while True:
+		            if flag_opening:
+		                flag_new_msg = False
+		                mqttClient.check_msg()
+		                
+		                if flag_opening and (time.ticks_ms() >= close_time):
+		                    close_door()
+		                elif not flag_new_msg:
+		                    time.sleep_ms(CHECK_DELAY_MS)
+		            else:
+		                mqttClient.wait_msg()                                                   #wait message
+		    
+		    except KeyboardInterrupt:
+		        flag_quit = True;
+		    
+		    except:
+		        pass
+		    
+		    finally:
+		        if(mqttClient is not None):
+		            mqttClient.disconnect()
+		        wlan.disconnect()
+		        wlan.active(False)
+		    
 		print("exit!")
 
