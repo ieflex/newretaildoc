@@ -1,6 +1,6 @@
 .. _zigbee-index:
 
-ZigBee使用指南
+ZigBee
 ------------------------------------
 
 本教程旨在帮助您开始使用ZigBee。
@@ -9,4 +9,4 @@ ZigBee使用指南
 .. toctree::
    :maxdepth: 2
 
-   quickref/quickref_index.rst
+   burn.rst
