@@ -6,7 +6,7 @@
 硬件连接
 ----------------------------
 
-TB板J11-RJ48口连接ZigBee模块J3-RJ48口，TB板J12-RJ48口连接LCD模块RJ48口：
+TB板J11-RJ48口连接ZigBee模块J3-RJ48口，TB板J12-RJ48口连接LCD模块RJ48口。
 
 .. image:: img/tblcd1.png
     :alt: tb_lcd
