@@ -19,7 +19,7 @@ Skids 参考
    :maxdepth: 1
    
    agv/index.rst
-   android/index.rst
+   android/android.rst
    erp/index.rst
    face/index.rst
    lock/index.rst
