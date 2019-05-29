@@ -1,4 +1,4 @@
-.. _skids-index:
+﻿.. _skids-index:
 
 电子秤操作界面
 ============================
@@ -38,6 +38,12 @@
 	7. 若支付成功，会自动清空已添加的商品，若支付过程发生错误，会弹窗提示；
 	
 		.. image:: img/scales_07.png
+
+
+.. toctree::
+   :maxdepth: 2
+
+   scale_driver.rst
 	
 
 
