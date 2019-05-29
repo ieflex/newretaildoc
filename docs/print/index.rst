@@ -1,6 +1,6 @@
-.. _skids-index:
+.. _print-index:
 
-打印机参考
+打印机
 ------------------------------------
 
 本教程旨在帮助您开始使用打印机。
@@ -9,4 +9,5 @@
 .. toctree::
    :maxdepth: 2
 
-   quickref/quickref_index.rst
+   source.rst
+   use.rst
