@@ -151,3 +151,4 @@ AT指令解析类
                     lcd.lcdDisplay(itemInfoList)
                 else:
                     print('incomplete data')
+
