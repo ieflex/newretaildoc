@@ -27,6 +27,7 @@
    print/index.rst
    scales/index.rst
    zigbee/index.rst
+   tb_lcd/index.rst
 
 -----------------
 
