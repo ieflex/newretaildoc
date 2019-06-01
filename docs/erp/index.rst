@@ -10,4 +10,6 @@
 .. toctree::
    :maxdepth: 2
 
-   quickref/quickref_index.rst
+   environment.rst
+   network.rst
+   code.rst
